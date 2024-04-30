@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
     DesktopOutlined,
     FileOutlined,
@@ -7,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import { Button } from 'antd/es/radio';
+// import fetch from 'node-fetch';
 import { useState } from 'react';
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -34,11 +36,33 @@ const items = [
   getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
   getItem('Files', '9', <FileOutlined />),
 ];
-const LayoutCompontens = () => {
+
+
+export async function getServerSideProps() {
+    try {
+      // Fetch data from external API
+      const res = await fetch('http://localhost:5000/api/v1/projects');
+      
+      if (!res.ok) {
+        throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
+      }
+  
+      const data = await res.json();
+  
+      // Pass data to the page via props
+      return { props: { data } };
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+      return { props: { data: null } }; // Handle the error gracefully
+    }
+  }
+
+const LayoutCompontens =async ({data}) => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  console.log(data)
   return (
     <Layout
       style={{
@@ -92,3 +116,13 @@ const LayoutCompontens = () => {
   );
 };
 export default LayoutCompontens;
+
+
+// export async function getServerSideProps() {
+//     // Fetch data from external API
+//     const res = await fetch(`http://localhost:5000/api/v1/projects`)
+//     const data = await res.json()
+   
+//     // Pass data to the page via props
+//     return { props: { data } }
+//   }
